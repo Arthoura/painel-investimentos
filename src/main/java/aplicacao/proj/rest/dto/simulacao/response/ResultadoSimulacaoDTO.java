@@ -1,32 +1,16 @@
 package aplicacao.proj.rest.dto.simulacao.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.math.BigDecimal;
+
+@Data
+@AllArgsConstructor
 public class ResultadoSimulacaoDTO {
 
-    private Double valorFinal;
-    private Double rentabilidadeEfetiva;
+    private BigDecimal valorFinal;
+    private BigDecimal rentabilidadeEfetiva;
     private Integer prazoMeses;
 
-    public Double getValorFinal() {
-        return valorFinal;
-    }
-
-    public void setValorFinal(Double valorFinal) {
-        this.valorFinal = valorFinal;
-    }
-
-    public Double getRentabilidadeEfetiva() {
-        return rentabilidadeEfetiva;
-    }
-
-    public void setRentabilidadeEfetiva(Double rentabilidadeEfetiva) {
-        this.rentabilidadeEfetiva = rentabilidadeEfetiva;
-    }
-
-    public Integer getPrazoMeses() {
-        return prazoMeses;
-    }
-
-    public void setPrazoMeses(Integer prazoMeses) {
-        this.prazoMeses = prazoMeses;
-    }
 }

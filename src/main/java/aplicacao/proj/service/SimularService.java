@@ -3,7 +3,6 @@ package aplicacao.proj.service;
 
 
 import aplicacao.proj.domain.repository.ProdutoRepository;
-import aplicacao.proj.rest.dto.*;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,21 +21,16 @@ import java.util.*;
 @Service
 public class SimularService {
 
-
+/*
     @Autowired
     @Qualifier("produtoRepository")
     ProdutoRepository produtoRepository;
-
-
-
-
 
 
     public SimularService(ProdutoRepository produtoRepository
                           ) {
         this.produtoRepository = produtoRepository;
     }
-
 
 
 
@@ -49,13 +43,11 @@ public class SimularService {
     }
 
 
-
     @Cacheable(value = "listaSimulacao")
     public List<PaginacaoDto<SimulacaoResumoDto>> listarSimulacao() {
 
         return null;
     }
-
 
 
     @Cacheable(value = "simulacoesPorData")
@@ -64,7 +56,7 @@ public class SimularService {
 
         return null;
     }
-
+*/
 
 
 }

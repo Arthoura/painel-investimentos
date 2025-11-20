@@ -1,44 +1,18 @@
 package aplicacao.proj.rest.dto.historicoProdutoDia;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Data
+@AllArgsConstructor
 public class ResumoProdutoDiaDto {
 
     private String produto;
     private LocalDate data;
     private Integer quantidadeSimulacoes;
-    private Double mediaValorFinal;
+    private BigDecimal mediaValorFinal;
 
-    // Getters e Setters
-    public String getProduto() {
-        return produto;
-    }
-
-    public void setProduto(String produto) {
-        this.produto = produto;
-    }
-
-    public LocalDate getData() {
-        return data;
-    }
-
-    public void setData(LocalDate data) {
-        this.data = data;
-    }
-
-    public Integer getQuantidadeSimulacoes() {
-        return quantidadeSimulacoes;
-    }
-
-    public void setQuantidadeSimulacoes(Integer quantidadeSimulacoes) {
-        this.quantidadeSimulacoes = quantidadeSimulacoes;
-    }
-
-    public Double getMediaValorFinal() {
-        return mediaValorFinal;
-    }
-
-    public void setMediaValorFinal(Double mediaValorFinal) {
-        this.mediaValorFinal = mediaValorFinal;
-    }
 }

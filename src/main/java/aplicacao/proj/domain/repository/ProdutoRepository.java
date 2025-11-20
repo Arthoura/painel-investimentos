@@ -7,16 +7,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProdutoRepository extends JpaRepository<Produto, Short> {
+public interface ProdutoRepository extends JpaRepository<Produto, Integer> {
 
-    @Query(value = "SELECT p FROM Produto p WHERE p.vrMinimo <= :valor " +
-            "AND (p.vrMaximo IS NULL OR p.vrMaximo >= :valor) " +
-            "AND p.nuMinimoMeses <= :prazo " +
-            "AND (p.nuMaximoMeses IS NULL OR p.nuMaximoMeses >= :prazo)")
-    Optional<Produto> findProdutoByValorAndPrazo(
-            @Param("valor") BigDecimal valor,
-            @Param("prazo") Short prazo);
+    List<Produto> findByTipo(String tipo);
+
+
 }

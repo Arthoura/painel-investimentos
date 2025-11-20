@@ -1,26 +1,15 @@
 package aplicacao.proj.rest.dto.telemetria;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 import java.time.LocalDate;
 
+@Data
+@AllArgsConstructor
 public class PeriodoDTO {
 
     private LocalDate inicio;
     private LocalDate fim;
 
-    // Getters e Setters
-    public LocalDate getInicio() {
-        return inicio;
-    }
-
-    public void setInicio(LocalDate inicio) {
-        this.inicio = inicio;
-    }
-
-    public LocalDate getFim() {
-        return fim;
-    }
-
-    public void setFim(LocalDate fim) {
-        this.fim = fim;
-    }
 }

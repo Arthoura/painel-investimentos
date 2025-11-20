@@ -1,8 +1,10 @@
 package aplicacao.proj.rest.dto.simulacao;
 
+import java.math.BigDecimal;
+
 public record SimulacaoRequestDto(
-        Long clienteId,
-        Double valor,
+        Integer clienteId,
+        BigDecimal valor,
         Integer prazoMeses,
         String tipoProduto
 ) {}

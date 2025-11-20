@@ -14,25 +14,21 @@ import java.math.BigDecimal;
 public class Produto {
 
     @Id
-    @Column(name = "CO_PRODUTO")
-    private Integer coProduto;
+    @Column(name = "ID")
+    private Integer id;
 
-    @Column(name = "NO_PRODUTO")
-    private String noProduto;
+    @Column(name = "NOME")
+    private String nome;
 
-    @Column(name = "PC_TAXA_JUROS")
-    private BigDecimal pcTaxaJuros;
+    @Column(name = "TIPO")
+    private String tipo;
 
-    @Column(name = "NU_MINIMO_MESES")
-    private Short nuMinimoMeses;
+    @Column(name = "RENTABILIDADE", precision = 5, scale = 4)
+    private BigDecimal rentabilidade;
 
-    @Column(name = "NU_MAXIMO_MESES")
-    private Short nuMaximoMeses;
+    @Column(name = "RISCO")
+    private String risco;
 
-    @Column(name = "VR_MINIMO")
-    private BigDecimal vrMinimo;
-
-    @Column(name = "VR_MAXIMO")
-    private BigDecimal vrMaximo;
-
+    @Column(name = "LIQUIDEZ")
+    private String liquidez;
 }

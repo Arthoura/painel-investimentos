@@ -1,53 +1,22 @@
 package aplicacao.proj.rest.dto.historicoInvestimentos;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
+
+@AllArgsConstructor
+@Getter
+@Setter
 public class InvestimentoDTO {
 
-    private Long id;
+    private Integer id;
     private String tipo;
-    private Double valor;
-    private Double rentabilidade;
+    private BigDecimal valor;
+    private BigDecimal rentabilidade;
     private LocalDate data;
 
-    // Getters e Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
-    public Double getValor() {
-        return valor;
-    }
-
-    public void setValor(Double valor) {
-        this.valor = valor;
-    }
-
-    public Double getRentabilidade() {
-        return rentabilidade;
-    }
-
-    public void setRentabilidade(Double rentabilidade) {
-        this.rentabilidade = rentabilidade;
-    }
-
-    public LocalDate getData() {
-        return data;
-    }
-
-    public void setData(LocalDate data) {
-        this.data = data;
-    }
 }
