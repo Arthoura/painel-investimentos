@@ -2,6 +2,7 @@ package aplicacao.proj.service;
 
 import aplicacao.proj.domain.entity.Produto;
 import aplicacao.proj.domain.repository.ProdutoRepository;
+import aplicacao.proj.exception.RecursoNaoEncontradoException;
 import aplicacao.proj.rest.dto.produtosRecomendados.ProdutoRecomendadoDTO;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,7 @@ public class ProdutoRecomendadoService {
                 pesoLiquidez = 0.2;
                 pesoRentabilidade = 0.7;
             }
-            default -> throw new IllegalArgumentException("Perfil inválido: " + perfil);
+            default -> throw new RecursoNaoEncontradoException("Perfil inválido: " + perfil);
         }
 
         return produtoRepository.findAll().stream()

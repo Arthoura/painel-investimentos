@@ -29,6 +29,15 @@ public class TelemetriaFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        String uri = request.getRequestURI();
+        String userAgent = Optional.ofNullable(request.getHeader("User-Agent")).orElse("").toLowerCase();
+
+        if (uri.contains("/swagger") || uri.contains("/v3/api-docs") || userAgent.contains("swagger")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+
         long inicio = System.currentTimeMillis();
 
         try {
@@ -37,7 +46,10 @@ public class TelemetriaFilter extends OncePerRequestFilter {
             long fim = System.currentTimeMillis();
             long tempoResposta = fim - inicio;
 
-            String servico = request.getRequestURI();
+            String fullPath = request.getRequestURI();
+            String contextPath = request.getContextPath();
+            String servico = fullPath.replaceAll("/\\d+", "").replace(contextPath, "");
+
             LocalDate hoje = LocalDate.now();
 
             Optional<Telemetria> existente = telemetriaRepository.findByServico(servico);

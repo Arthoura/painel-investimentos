@@ -5,6 +5,7 @@ import aplicacao.proj.domain.entity.Produto;
 import aplicacao.proj.domain.entity.Simulacao;
 import aplicacao.proj.domain.repository.ProdutoRepository;
 import aplicacao.proj.domain.repository.SimulacaoRepository;
+import aplicacao.proj.exception.RecursoNaoEncontradoException;
 import aplicacao.proj.rest.dto.historicoProdutoDia.ResumoProdutoDiaDto;
 import aplicacao.proj.rest.dto.historicoSimulacoes.SimulacaoResumoDTO;
 import aplicacao.proj.rest.dto.perfilRisco.PerfilRiscoDTO;
@@ -38,7 +39,7 @@ public class SimulacaoService {
     }
 
     public SimulacaoResponseDto simularInvestimento(SimulacaoRequestDto request) {
-        PerfilRiscoDTO perfilDto = perfilRiscoService.calcularPerfil(request.clienteId());
+        PerfilRiscoDTO perfilDto = perfilRiscoService.calcularPerfil(request.getClienteId());
         Perfil perfil = Perfil.valueOf(perfilDto.getPerfil().toUpperCase());
 
         double pesoRisco, pesoLiquidez, pesoRentabilidade;
@@ -61,26 +62,27 @@ public class SimulacaoService {
             default -> throw new IllegalArgumentException("Perfil inválido: " + perfil);
         }
 
-        var produtos = produtoRepository.findByTipo(request.tipoProduto());
+        List<Produto> produtos = produtoRepository.findByTipo(request.getTipoProduto());
 
-        var melhorProduto = produtos.stream()
+        ProdutoComScore melhorProduto = produtos.stream()
                 .map(p -> new ProdutoComScore(p, scoringService.calcularScore(p, pesoRisco, pesoLiquidez, pesoRentabilidade)))
                 .max(Comparator.comparingDouble(ProdutoComScore::score))
-                .orElseThrow(() -> new IllegalArgumentException("Nenhum produto encontrado para tipo: " + request.tipoProduto()));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Nenhum produto encontrado para o tipo informado: " + request.getTipoProduto()));
+        ;
 
         Produto produto = melhorProduto.produto();
         BigDecimal rentabilidade = produto.getRentabilidade();
 
         BigDecimal taxaMensal = rentabilidade.divide(BigDecimal.valueOf(12), 10, BigDecimal.ROUND_HALF_UP);
-        BigDecimal fator = BigDecimal.ONE.add(taxaMensal.multiply(BigDecimal.valueOf(request.prazoMeses())));
-        BigDecimal valorFinal = request.valor().multiply(fator).setScale(2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal fator = BigDecimal.ONE.add(taxaMensal.multiply(BigDecimal.valueOf(request.getPrazoMeses())));
+        BigDecimal valorFinal = request.getValor().multiply(fator).setScale(2, BigDecimal.ROUND_HALF_UP);
 
         Simulacao simulacao = new Simulacao();
-        simulacao.setClientId(request.clienteId());
+        simulacao.setClientId(request.getClienteId());
         simulacao.setProduto(produto);
-        simulacao.setValorInvestido(request.valor());
+        simulacao.setValorInvestido(request.getValor());
         simulacao.setValorFinal(valorFinal);
-        simulacao.setPrazoMeses(request.prazoMeses());
+        simulacao.setPrazoMeses(request.getPrazoMeses());
         simulacao.setDataSimulacao(LocalDateTime.now());
 
         simulacaoRepository.save(simulacao);
@@ -96,7 +98,7 @@ public class SimulacaoService {
                 new ResultadoSimulacaoDTO(
                         valorFinal,
                         rentabilidade,
-                        request.prazoMeses()
+                        request.getPrazoMeses()
                 ),
                 LocalDateTime.now()
         );

@@ -1,7 +1,6 @@
 package aplicacao.proj.Enums;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
 @Getter

@@ -4,6 +4,7 @@ import aplicacao.proj.domain.entity.Investimento;
 import aplicacao.proj.domain.repository.InvestimentoRepository;
 import aplicacao.proj.rest.dto.historicoInvestimentos.InvestimentoDTO;
 import org.springframework.stereotype.Service;
+import aplicacao.proj.exception.RecursoNaoEncontradoException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +20,10 @@ public class InvestimentoService {
 
     public List<InvestimentoDTO> listarPorCliente(Integer clienteId) {
         List<Investimento> investimentos = investimentoRepository.findByClienteId(clienteId);
+
+        if (investimentos.isEmpty()) {
+            throw new RecursoNaoEncontradoException("Nenhum investimento encontrado para o cliente informado.");
+        }
 
         return investimentos.stream()
                 .map(inv -> new InvestimentoDTO(

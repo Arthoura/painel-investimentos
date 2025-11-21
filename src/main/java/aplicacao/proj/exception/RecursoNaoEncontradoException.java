@@ -1,0 +1,8 @@
+package aplicacao.proj.exception;
+
+
+public class RecursoNaoEncontradoException extends RuntimeException {
+  public RecursoNaoEncontradoException(String mensagem) {
+    super(mensagem);
+  }
+}

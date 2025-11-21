@@ -112,7 +112,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
-
         <!-- DEPENDÊNCIAS PARA JWT E KEYCLOAK -->
 
         <dependency>

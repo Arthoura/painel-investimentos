@@ -7,6 +7,7 @@ import aplicacao.proj.domain.entity.Cliente;
 import aplicacao.proj.domain.entity.Investimento;
 import aplicacao.proj.domain.repository.ClienteRepository;
 import aplicacao.proj.domain.repository.InvestimentoRepository;
+import aplicacao.proj.exception.RecursoNaoEncontradoException;
 import aplicacao.proj.rest.dto.perfilRisco.PerfilRiscoDTO;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +27,14 @@ public class PerfilRiscoService {
 
     public PerfilRiscoDTO calcularPerfil(Integer clienteId) {
         Cliente cliente = clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado: " + clienteId));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado: " + clienteId));
 
         List<Investimento> investimentos = investimentoRepository.findByClienteId(clienteId);
         BigDecimal volumeTotal = investimentos.stream()
-                .map(i -> i.getValor())
-                .reduce((v1, v2) -> v1.add(v2))
-                .orElseThrow(() -> new IllegalArgumentException("Cliente sem investimentos"));
+                .map(Investimento::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add); // valor inicial = ZERO
+
+
 
         int pontuacao = 0;
 
@@ -54,7 +56,7 @@ public class PerfilRiscoService {
             case LIQUIDEZ -> pontuacao += 10;
             case RENTABILIDADE -> pontuacao += 30;
             case EQUILIBRIO -> pontuacao += 20;
-            default -> pontuacao += 15; // opcional: caso queira tratar nulo ou valor inesperado
+            default -> pontuacao += 15;
         }
 
 
