@@ -22,6 +22,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
+
 @Service
 public class SimulacaoService {
 
@@ -30,14 +33,17 @@ public class SimulacaoService {
     private final ProdutoScoringService scoringService;
     private final SimulacaoRepository simulacaoRepository;
 
-
-    public SimulacaoService(SimulacaoRepository simulacaoRepository, ProdutoRepository produtoRepository, PerfilRiscoService perfilRiscoService, ProdutoScoringService scoringService) {
+    public SimulacaoService(SimulacaoRepository simulacaoRepository,
+                            ProdutoRepository produtoRepository,
+                            PerfilRiscoService perfilRiscoService,
+                            ProdutoScoringService scoringService) {
         this.produtoRepository = produtoRepository;
         this.perfilRiscoService = perfilRiscoService;
         this.scoringService = scoringService;
         this.simulacaoRepository = simulacaoRepository;
     }
 
+    @CircuitBreaker(name = "sqlServerCircuitBreaker", fallbackMethod = "fallbackSimularInvestimento")
     public SimulacaoResponseDto simularInvestimento(SimulacaoRequestDto request) {
         PerfilRiscoDTO perfilDto = perfilRiscoService.calcularPerfil(request.getClienteId());
         Perfil perfil = Perfil.valueOf(perfilDto.getPerfil().toUpperCase());
@@ -68,7 +74,6 @@ public class SimulacaoService {
                 .map(p -> new ProdutoComScore(p, scoringService.calcularScore(p, pesoRisco, pesoLiquidez, pesoRentabilidade)))
                 .max(Comparator.comparingDouble(ProdutoComScore::score))
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Nenhum produto encontrado para o tipo informado: " + request.getTipoProduto()));
-        ;
 
         Produto produto = melhorProduto.produto();
         BigDecimal rentabilidade = produto.getRentabilidade();
@@ -104,6 +109,15 @@ public class SimulacaoService {
         );
     }
 
+// Fallback chamado quando o circuito está aberto ou ocorre falha
+    public SimulacaoResponseDto fallbackSimularInvestimento(SimulacaoRequestDto request, Throwable t) {
+        if (t instanceof RecursoNaoEncontradoException) {
+            throw (RecursoNaoEncontradoException) t;
+        }
+        throw new RecursoNaoEncontradoException("Serviço temporariamente indisponível. Tente novamente mais tarde.");
+    }
+
+    // Demais métodos podem também ser protegidos com circuit breaker se necessário
     public List<SimulacaoResumoDTO> listarSimulacoes() {
         return simulacaoRepository.findAll().stream()
                 .map(s -> new SimulacaoResumoDTO(
@@ -144,6 +158,5 @@ public class SimulacaoService {
     }
 
     private record ProdutoDataKey(String produto, LocalDate data) {}
-
     private record ProdutoComScore(Produto produto, double score) {}
 }

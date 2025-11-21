@@ -94,7 +94,9 @@ A API utiliza **Keycloak** com autenticação via **JWT**.
 * Client ID: `investe-api`.
 * Tipo: OpenID Connect.
 * Access type: _public_ (para testes simples).
+* Client authentication: on
 * Salve.
+* Após criado, ir em credentials e copiar o Client Secret.
 
 ### 3. Criar a Role
 
@@ -115,11 +117,12 @@ A API utiliza **Keycloak** com autenticação via **JWT**.
 
 ### 6. Envie o token no header:
 
-
   ```plaintext
   Authorization: Bearer <seu_token>
   ```
+# ⚠️ Atenção
 
+Para fins de facilitar os **testes**, somente o endpoint **`/telemetria`** precisa de autenticação.
 ---
 
 ## 📂 Coletânea de Requisições HTTP

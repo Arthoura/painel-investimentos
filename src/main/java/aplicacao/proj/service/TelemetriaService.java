@@ -1,11 +1,12 @@
 package aplicacao.proj.service;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import org.springframework.stereotype.Service;
 import aplicacao.proj.domain.entity.Telemetria;
 import aplicacao.proj.domain.repository.TelemetriaRepository;
 import aplicacao.proj.rest.dto.telemetria.PeriodoDTO;
 import aplicacao.proj.rest.dto.telemetria.ServicoDesempenhoDTO;
 import aplicacao.proj.rest.dto.telemetria.TelemetriaResponseDTO;
-import org.springframework.stereotype.Service;
 
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ public class TelemetriaService {
         chamadas.computeIfAbsent(endpoint, k -> new ArrayList<>()).add(tempoRespostaMs);
     }
 
+    @CircuitBreaker(name = "sqlServerCircuitBreaker", fallbackMethod = "fallbackObterDadosTelemetria")
     public TelemetriaResponseDTO obterDadosTelemetria() {
         List<Telemetria> registros = telemetriaRepository.findAll();
 
@@ -53,6 +55,11 @@ public class TelemetriaService {
         PeriodoDTO periodo = new PeriodoDTO(inicio, fim);
 
         return new TelemetriaResponseDTO(servicos, periodo);
+    }
+
+    // Fallback chamado quando o circuito está aberto ou ocorre falha
+    public TelemetriaResponseDTO fallbackObterDadosTelemetria(Throwable t) {
+        throw new RuntimeException("Serviço temporariamente indisponível. Tente novamente mais tarde.");
     }
 
     private String normalizarNome(String path) {

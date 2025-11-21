@@ -3,6 +3,7 @@ package aplicacao.proj.service;
 import aplicacao.proj.domain.entity.Investimento;
 import aplicacao.proj.domain.repository.InvestimentoRepository;
 import aplicacao.proj.rest.dto.historicoInvestimentos.InvestimentoDTO;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.stereotype.Service;
 import aplicacao.proj.exception.RecursoNaoEncontradoException;
 
@@ -18,6 +19,7 @@ public class InvestimentoService {
         this.investimentoRepository = investimentoRepository;
     }
 
+    @CircuitBreaker(name = "sqlServerCircuitBreaker", fallbackMethod = "fallbackListarPorCliente")
     public List<InvestimentoDTO> listarPorCliente(Integer clienteId) {
         List<Investimento> investimentos = investimentoRepository.findByClienteId(clienteId);
 
@@ -34,5 +36,13 @@ public class InvestimentoService {
                         inv.getData().toLocalDate()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    // Fallback: retorna mensagem de indisponibilidade
+    public List<InvestimentoDTO> fallbackListarPorCliente(Integer clienteId, Throwable t) {
+        if (t instanceof RecursoNaoEncontradoException) {
+            throw (RecursoNaoEncontradoException) t;
+        }
+        throw new RecursoNaoEncontradoException("Serviço temporariamente indisponível. Tente novamente mais tarde.");
     }
 }
