@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      # Configuração do SQL Server
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver_db:1433;databaseName=master;encrypt=false
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=Password23
+
+      # Configuração do Redis
+      - SPRING_DATA_REDIS_HOST=redis_db
+      - SPRING_DATA_REDIS_PORT=6379
+    depends_on:
+      - sqlserver_db
+      - redis_db
+    networks:
+      - app-network
+
+  sqlserver_db:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sqlserver_db
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Password23
+      - MSSQL_PID=Developer
+    networks:
+      - app-network
+
+  redis_db:
+    image: "redis:7.2.5-alpine"
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.2
+    container_name: keycloak
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports:
+      - "8081:8080"
+
+networks:
+  app-network:
+    driver: bridge

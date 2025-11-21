@@ -1,5 +1,6 @@
 package aplicacao.proj.filter;
 
+import aplicacao.proj.domain.EndpointData;
 import aplicacao.proj.domain.entity.Telemetria;
 import aplicacao.proj.domain.repository.TelemetriaRepository;
 import jakarta.servlet.FilterChain;
@@ -13,21 +14,26 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Component
 public class TelemetriaFilter extends OncePerRequestFilter {
 
     private final TelemetriaRepository telemetriaRepository;
+    private final List<EndpointData> telemetryDataList = Collections.synchronizedList(new ArrayList<>());
 
     public TelemetriaFilter(TelemetriaRepository telemetriaRepository) {
         this.telemetriaRepository = telemetriaRepository;
     }
 
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    public void doFilterInternal(HttpServletRequest request,
+                                 HttpServletResponse response,
+                                 FilterChain filterChain) throws ServletException, IOException {
 
         String uri = request.getRequestURI();
         String userAgent = Optional.ofNullable(request.getHeader("User-Agent")).orElse("").toLowerCase();
@@ -46,10 +52,9 @@ public class TelemetriaFilter extends OncePerRequestFilter {
             long fim = System.currentTimeMillis();
             long tempoResposta = fim - inicio;
 
-            String fullPath = request.getRequestURI();
-            String contextPath = request.getContextPath();
+            String fullPath = Optional.ofNullable(request.getRequestURI()).orElse("");
+            String contextPath = Optional.ofNullable(request.getContextPath()).orElse("");
             String servico = fullPath.replaceAll("/\\d+", "").replace(contextPath, "");
-
             LocalDate hoje = LocalDate.now();
 
             Optional<Telemetria> existente = telemetriaRepository.findByServico(servico);
@@ -84,7 +89,13 @@ public class TelemetriaFilter extends OncePerRequestFilter {
                 nova.setPeriodoFim(hoje);
 
                 telemetriaRepository.save(nova);
+                telemetryDataList.add(new EndpointData(servico, response.getStatus(), tempoResposta));
             }
         }
     }
+
+    public List<EndpointData> getTelemetryDataList() {
+        return telemetryDataList;
+    }
+
 }
