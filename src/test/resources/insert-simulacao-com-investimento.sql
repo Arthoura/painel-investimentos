@@ -8,8 +8,8 @@ INSERT INTO dbo.cliente (
     preferencia_liquidez_rentabilidade
 ) VALUES (
     1,
-    'Ivson',
-    'ivson@email.com',
+    'Arthur',
+    'Arthur@email.com',
     5000.00,
     3,
     'EQUILIBRIO'
